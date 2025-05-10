@@ -18,7 +18,7 @@ echo "Setting environment variables..."
 export SPRING_PROFILES_ACTIVE=prod
 export JWT_SECRET=${JWT_SECRET:-"MahaLakshya_JWT_Secret_Key_2025_Secure_Token_Auth"}
 export ADMIN_KEY=${ADMIN_KEY:-"MahaLakshya_Admin_Registration_Key_2025"}
-export CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-"https://mahalaxya.kundanprojects.space"}
+export CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-"https://mahalaxya.kundanprojects.space,http://mahalaxya.kundanprojects.space"}
 export CORS_ALLOWED_METHODS=${CORS_ALLOWED_METHODS:-"GET,POST,PUT,DELETE,OPTIONS"}
 export CORS_ALLOWED_HEADERS=${CORS_ALLOWED_HEADERS:-"Authorization,Content-Type,X-Requested-With,Accept"}
 export CORS_EXPOSED_HEADERS=${CORS_EXPOSED_HEADERS:-"Authorization"}
@@ -87,9 +87,10 @@ TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 LOG_FILE="logs/app_${TIMESTAMP}.log"
 
 # Add debug options to see exactly what properties Spring is using
-JAVA_OPTS="-Dspring.profiles.active=prod -Dlogging.level.org.springframework=DEBUG -Dlogging.level.com.tradingsim=DEBUG"
+JAVA_OPTS="-Dspring.profiles.active=prod -Dlogging.level.org.springframework=INFO -Dlogging.level.com.tradingsim=INFO"
 
 nohup java $JAVA_OPTS \
+  -Dspring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect \
   -Dcors.allowed-origins="$CORS_ALLOWED_ORIGINS" \
   -Dcors.allowed-methods="$CORS_ALLOWED_METHODS" \
   -Dcors.allowed-headers="$CORS_ALLOWED_HEADERS" \
@@ -102,7 +103,7 @@ echo $APP_PID > app.pid
 # Check if application started successfully
 sleep 15
 if ps -p $APP_PID &> /dev/null; then
-  echo "===== Mahalaxya API successfully started on https://mahalaxya-api.kundanprojects.space ====="
+  echo "===== Mahalaxya API successfully started on http://mahalaxya-api.kundanprojects.space ====="
   echo "PID: $APP_PID"
   echo "Log file: $LOG_FILE"
   echo "Deployment completed at $(date)"

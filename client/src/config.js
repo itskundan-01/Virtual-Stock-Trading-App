@@ -8,7 +8,7 @@
 
 // API Base URLs
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://stock.indianapi.in";
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+export const API_URL = import.meta.env.VITE_API_URL || 'http://mahalaxya-api.kundanprojects.space/api';
 // Updated the finance news API URL to the correct domain
 export const FINANCE_NEWS_API_URL = import.meta.env.VITE_FINANCE_NEWS_API_URL || 'https://finance-news.kundanprojects.space';
 // AlphaVantage API configuration
