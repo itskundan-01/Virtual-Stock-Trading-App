@@ -82,6 +82,7 @@ public class WebSecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> 
                 auth.requestMatchers(apiBaseUrl + "/auth/**").permitAll()
+                    .requestMatchers(apiBaseUrl + "/health/**").permitAll()
                     .requestMatchers(apiBaseUrl + "/stocks/list").permitAll()
                     .requestMatchers(apiBaseUrl + "/stocks/price/**").permitAll()
                     .requestMatchers(apiBaseUrl + "/market-news").permitAll()
