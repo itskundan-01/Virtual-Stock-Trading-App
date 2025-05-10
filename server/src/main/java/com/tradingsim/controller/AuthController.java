@@ -108,4 +108,63 @@ public class AuthController {
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
+
+    @PostMapping("/register-first-admin")
+    public ResponseEntity<?> registerFirstAdmin(@Valid @RequestBody RegisterRequest registerRequest, 
+                                              @RequestParam String adminKey) {
+        // Check if there are already users with ROLE_ADMIN
+        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
+                .orElseThrow(() -> new RuntimeException("Error: Admin role is not found."));
+        
+        List<User> admins = userRepository.findAll().stream()
+                .filter(user -> user.getRoles().contains(adminRole))
+                .toList();
+        
+        if (!admins.isEmpty()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Admin user already exists. Use the admin panel to create more admins."));
+        }
+        
+        // Verify admin key against application property
+        if (!adminKey.equals("MahaLakshyaAdmin2025Key!")) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Invalid admin registration key"));
+        }
+        
+        if (userRepository.existsByEmail(registerRequest.getEmail())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Email is already in use!"));
+        }
+
+        // Create new admin account
+        User user = new User();
+        user.setFirstName(registerRequest.getFirstName());
+        user.setLastName(registerRequest.getLastName());
+        user.setEmail(registerRequest.getEmail());
+        user.setPassword(encoder.encode(registerRequest.getPassword()));
+
+        Set<Role> roles = new HashSet<>();
+        
+        // Assign ROLE_ADMIN
+        roles.add(adminRole);
+        
+        // Also assign ROLE_USER to admins (so they can access user features too)
+        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+                .orElseThrow(() -> new RuntimeException("Error: User role is not found."));
+        roles.add(userRole);
+        
+        user.setRoles(roles);
+        User savedUser = userRepository.save(user);
+        
+        // Create wallet for new admin
+        Wallet wallet = new Wallet();
+        wallet.setUser(savedUser);
+        wallet.setBalance(BigDecimal.valueOf(1000000)); // Starting balance of ₹10 lakh
+        walletRepository.save(wallet);
+
+        return ResponseEntity.ok(new MessageResponse("First admin registered successfully!"));
+    }
 }
