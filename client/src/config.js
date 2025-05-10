@@ -16,7 +16,7 @@ export const ALPHA_VANTAGE_API_URL = "https://www.alphavantage.co/query";
 export const ALPHA_VANTAGE_API_KEY = "LG1LRCEPYYLALG5Q";
 
 // API Keys and Auth
-export const API_KEY = import.meta.env.VITE_API_KEY || "";
+export const API_KEY = import.meta.env.VITE_API_KEY || "apikey_mock_for_development_12345";
 export const FINANCE_NEWS_API_KEY = import.meta.env.VITE_FINANCE_NEWS_API_KEY || "MiaaEdv6406K9wmvjYT3fOpL4M4tSzuc";
 
 // Feature Flags

@@ -134,7 +134,10 @@ const fallbackToServerAPI = async (category) => {
     try {
       console.log('Trying stock API fallback');
       const fallbackResponse = await stockApi.get('/news', {
-        params: category !== 'all' ? { category } : {}
+        params: category !== 'all' ? { category } : {},
+        headers: {
+          'x-api-key': API_KEY // Explicitly include the API key in request headers
+        }
       });
       if (fallbackResponse && fallbackResponse.data) {
         console.log('Successfully fetched news from stock API');
@@ -264,7 +267,10 @@ const fallbackToStockApi = async (stockSymbol) => {
   try {
     console.log('Using stock API fallback for', stockSymbol);
     const response = await stockApi.get(`/stock`, {
-      params: { name: stockSymbol }
+      params: { name: stockSymbol },
+      headers: {
+        'x-api-key': API_KEY // Explicitly include the API key in request headers
+      }
     });
     return response.data;
   } catch (error) {
@@ -275,7 +281,11 @@ const fallbackToStockApi = async (stockSymbol) => {
 
 export const fetchTrendingStocks = async () => {
   try {
-    const response = await stockApi.get('/trending');
+    const response = await stockApi.get('/trending', {
+      headers: {
+        'x-api-key': API_KEY // Explicitly include the API key in request headers
+      }
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching trending stocks:', error);
@@ -285,7 +295,11 @@ export const fetchTrendingStocks = async () => {
 
 export const fetchIPOData = async () => {
   try {
-    const response = await stockApi.get('/ipo');
+    const response = await stockApi.get('/ipo', {
+      headers: {
+        'x-api-key': API_KEY // Explicitly include the API key in request headers
+      }
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching IPO data:', error);
