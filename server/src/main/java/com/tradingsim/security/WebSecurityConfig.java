@@ -4,6 +4,7 @@ import com.tradingsim.security.jwt.AuthEntryPointJwt;
 import com.tradingsim.security.jwt.AuthTokenFilter;
 import com.tradingsim.security.services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,6 +33,21 @@ public class WebSecurityConfig {
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
+    
+    @Value("${cors.allowed-origins}")
+    private String allowedOrigins;
+    
+    @Value("${cors.allowed-methods}")
+    private String allowedMethods;
+    
+    @Value("${cors.allowed-headers}")
+    private String allowedHeaders;
+    
+    @Value("${cors.exposed-headers}")
+    private String exposedHeaders;
+    
+    @Value("${api.base-url:/api}")
+    private String apiBaseUrl;
 
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -65,12 +81,12 @@ public class WebSecurityConfig {
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> 
-                auth.requestMatchers("/api/auth/**").permitAll()
-                    .requestMatchers("/api/stocks/list").permitAll()
-                    .requestMatchers("/api/stocks/price/**").permitAll()
-                    .requestMatchers("/api/market-news").permitAll()
-                    .requestMatchers("/api/tutorials").permitAll()
-                    .requestMatchers("/api/test/**").permitAll()
+                auth.requestMatchers(apiBaseUrl + "/auth/**").permitAll()
+                    .requestMatchers(apiBaseUrl + "/stocks/list").permitAll()
+                    .requestMatchers(apiBaseUrl + "/stocks/price/**").permitAll()
+                    .requestMatchers(apiBaseUrl + "/market-news").permitAll()
+                    .requestMatchers(apiBaseUrl + "/tutorials").permitAll()
+                    .requestMatchers(apiBaseUrl + "/test/**").permitAll()
                     .anyRequest().authenticated()
             );
         
@@ -83,11 +99,17 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Allow requests from any origin during development
-        configuration.setAllowedOrigins(Arrays.asList("*"));  // More permissive for testing
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept"));
-        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        
+        // Parse comma-separated values from properties
+        String[] origins = allowedOrigins.split(",");
+        String[] methods = allowedMethods.split(",");
+        String[] headers = allowedHeaders.split(",");
+        String[] exposed = exposedHeaders.split(",");
+        
+        configuration.setAllowedOrigins(Arrays.asList(origins));
+        configuration.setAllowedMethods(Arrays.asList(methods));
+        configuration.setAllowedHeaders(Arrays.asList(headers));
+        configuration.setExposedHeaders(Arrays.asList(exposed));
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
