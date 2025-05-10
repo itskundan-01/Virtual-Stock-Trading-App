@@ -1,0 +1,211 @@
+.stock-price-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.stock-price-container h2 {
+  text-align: center;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.helper-text {
+  text-align: center;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.search-container {
+  display: flex;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.stock-input {
+  flex: 1;
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.fetch-btn {
+  padding: 10px 20px;
+  background-color: #2c3e50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  min-width: 120px;
+}
+
+.fetch-btn:hover {
+  background-color: #1e2b38;
+}
+
+.fetch-btn:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: #e74c3c;
+  margin-bottom: 20px;
+  text-align: center;
+  padding: 10px;
+  background-color: rgba(231, 76, 60, 0.1);
+  border-radius: 4px;
+}
+
+.price-result {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border-left: 5px solid #3498db;
+}
+
+.price-result h3 {
+  margin-top: 0;
+  color: #2c3e50;
+  font-size: 24px;
+}
+
+.price-value {
+  font-size: 36px;
+  font-weight: bold;
+  margin: 15px 0;
+  color: #333;
+}
+
+.price-change {
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
+.price-change .positive {
+  color: #27ae60;
+}
+
+.price-change .negative {
+  color: #e74c3c;
+}
+
+.additional-info {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.additional-info div {
+  margin-bottom: 8px;
+  color: #555;
+}
+
+.stock-description {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+}
+
+.stock-description h4 {
+  margin-top: 0;
+  color: #2c3e50;
+}
+
+.stock-description p {
+  color: #555;
+  line-height: 1.5;
+}
+
+.last-updated {
+  margin-top: 15px;
+  font-size: 12px;
+  color: #7f8c8d;
+  text-align: right;
+}
+
+.popular-stocks {
+  margin-top: 30px;
+}
+
+.popular-stocks h3 {
+  color: #34495e;
+  font-size: 18px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+.stock-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.stock-chip {
+  background-color: #f1f1f1;
+  border-radius: 16px;
+  padding: 8px 16px;
+  display: inline-block;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.stock-chip:hover {
+  background-color: #e0e0e0;
+}
+
+.stock-name {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 100;
+}
+
+.stock-chip:hover .stock-name {
+  display: block;
+}
+
+.exchange-info {
+  margin-top: 30px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.exchange-info p {
+  margin: 5px 0;
+  color: #555;
+}
+
+@media (max-width: 768px) {
+  .search-container {
+    flex-direction: column;
+  }
+  
+  .price-value {
+    font-size: 28px;
+  }
+  
+  .stock-chips {
+    justify-content: center;
+  }
+}
