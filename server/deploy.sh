@@ -3,6 +3,15 @@
 # Deployment script for Mahalaxya API
 echo "===== Starting Mahalaxya API deployment at $(date) ====="
 
+# Kill any existing Maven processes that might cause hangs
+echo "Checking for any existing Maven processes..."
+mvn_pids=$(ps aux | grep "[m]vn\|[m]aven" | awk '{print $2}')
+if [ ! -z "$mvn_pids" ]; then
+    echo "Found running Maven processes. Terminating them before proceeding."
+    echo $mvn_pids | xargs kill -9 || true
+    sleep 2
+fi
+
 # Ensure we're in the server directory
 SERVER_DIR="$HOME/Virtual-Stock-Trading-App/server"
 if [ ! -d "$SERVER_DIR" ]; then
@@ -18,10 +27,10 @@ echo "Setting environment variables..."
 export SPRING_PROFILES_ACTIVE=prod
 export JWT_SECRET=${JWT_SECRET:-"MahaLakshya_JWT_Secret_Key_2025_Secure_Token_Auth"}
 export ADMIN_KEY=${ADMIN_KEY:-"MahaLakshya_Admin_Registration_Key_2025"}
-export CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-"https://mahalaxya.kundanprojects.space,http://mahalaxya.kundanprojects.space"}
-export CORS_ALLOWED_METHODS=${CORS_ALLOWED_METHODS:-"GET,POST,PUT,DELETE,OPTIONS"}
-export CORS_ALLOWED_HEADERS=${CORS_ALLOWED_HEADERS:-"Authorization,Content-Type,X-Requested-With,Accept"}
-export CORS_EXPOSED_HEADERS=${CORS_EXPOSED_HEADERS:-"Authorization"}
+export CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-"https://mahalaxya.kundanprojects.space,http://mahalaxya.kundanprojects.space,http://localhost:5173"}
+export CORS_ALLOWED_METHODS=${CORS_ALLOWED_METHODS:-"GET,POST,PUT,DELETE,OPTIONS,HEAD"}
+export CORS_ALLOWED_HEADERS=${CORS_ALLOWED_HEADERS:-"Authorization,Content-Type,X-Requested-With,Accept,Origin,Access-Control-Allow-Origin"}
+export CORS_EXPOSED_HEADERS=${CORS_EXPOSED_HEADERS:-"Authorization,Access-Control-Allow-Origin"}
 export CLIENT_APP_URL=${CLIENT_APP_URL:-"https://mahalaxya.kundanprojects.space"}
 
 # Check if Maven wrapper exists, if not download it
@@ -53,9 +62,18 @@ echo "Java version: $(java -version 2>&1 | head -1)"
 # Create logs directory if it doesn't exist
 mkdir -p logs
 
-# Build the JAR file
+# Clean target directory before building to avoid stale artifacts
+echo "Cleaning target directory..."
+rm -rf target/
+
+# Build the JAR file with a timeout to avoid hanging builds
 echo "Building application..."
-./mvnw clean package -DskipTests || { echo "Build failed"; exit 1; }
+timeout 300s ./mvnw clean package -DskipTests || { 
+  echo "Build failed or timed out after 5 minutes. Killing any Maven processes and trying again."
+  ps aux | grep "[m]vn\|[m]aven" | awk '{print $2}' | xargs kill -9 || true
+  sleep 5
+  ./mvnw clean package -DskipTests || { echo "Build failed after second attempt"; exit 1; }
+}
 
 # Check if JAR was created successfully
 if [ ! -f "target/server-0.0.1-SNAPSHOT.jar" ]; then
