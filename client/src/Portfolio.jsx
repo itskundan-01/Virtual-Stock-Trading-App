@@ -25,27 +25,51 @@ function Portfolio() {
       
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get(`${API_URL}/trades`, {
+        const res = await axios.get(`${API_URL}/portfolio/trades`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         
+        console.log('Trades response:', res.data);
         setTrades(res.data);
         
-        // Calculate portfolio summary
-        // In a real app, you would fetch current prices for each stock
-        // For now, we'll use the trade price as current price
+        // Fixed calculation logic for portfolio summary
         let totalInvestment = 0;
         let currentValue = 0;
         
-        // This is a simplified calculation - in a real app you'd need to track
-        // the shares currently owned based on buy/sell history
+        // Group trades by stock symbol to track actual holdings
+        const holdings = {};
+        
         res.data.forEach(trade => {
-          if (trade.type === 'buy') {
-            totalInvestment += trade.quantity * trade.price;
-            currentValue += trade.quantity * trade.price * 1.05; // Dummy 5% growth
-          } else {
-            totalInvestment -= trade.quantity * trade.price;
-            currentValue -= trade.quantity * trade.price * 1.05;
+          const symbol = trade.stockSymbol;
+          
+          if (!holdings[symbol]) {
+            holdings[symbol] = {
+              quantity: 0,
+              investment: 0
+            };
+          }
+          
+          if (trade.type === 'BUY') {
+            // For buy transactions, add to quantity and increase investment
+            holdings[symbol].quantity += trade.quantity;
+            holdings[symbol].investment += trade.quantity * trade.price;
+          } else if (trade.type === 'SELL') {
+            // For sell transactions, reduce quantity but don't change original investment cost
+            holdings[symbol].quantity -= trade.quantity;
+          }
+        });
+        
+        // Calculate total investment and current value based on actual holdings
+        Object.keys(holdings).forEach(symbol => {
+          const holding = holdings[symbol];
+          
+          if (holding.quantity > 0) {
+            totalInvestment += holding.investment;
+            
+            // For current value, use the latest price from the database (or estimate with 5%)
+            // In a real app, you would fetch current price for each stock
+            const currentPrice = holding.investment / holding.quantity * 1.05; // Using 5% growth as placeholder
+            currentValue += holding.quantity * currentPrice;
           }
         });
         
@@ -62,6 +86,7 @@ function Portfolio() {
         toast.success('Portfolio data loaded');
       } catch (error) {
         toast.error('Failed to load portfolio data');
+        console.error('Portfolio data error:', error);
       } finally {
         setLoading(false);
       }
@@ -75,20 +100,25 @@ function Portfolio() {
     const existing = acc.find(item => item.symbol === trade.stockSymbol);
     
     if (existing) {
-      if (trade.type === 'buy') {
+      // Handle BUY transactions
+      if (trade.type === 'BUY') {
         existing.quantity += trade.quantity;
         existing.investment += trade.quantity * trade.price;
-      } else {
+      } 
+      // Handle SELL transactions
+      else if (trade.type === 'SELL') {
         existing.quantity -= trade.quantity;
-        existing.sold += trade.quantity * trade.price;
+        // We don't subtract from investment for sell transactions
+        // This keeps our cost basis accurate
       }
       existing.trades.push(trade);
     } else {
+      // Create new entry if first time seeing this symbol
       acc.push({
         symbol: trade.stockSymbol,
-        quantity: trade.type === 'buy' ? trade.quantity : -trade.quantity,
-        investment: trade.type === 'buy' ? trade.quantity * trade.price : 0,
-        sold: trade.type === 'sell' ? trade.quantity * trade.price : 0,
+        quantity: trade.type === 'BUY' ? trade.quantity : -trade.quantity,
+        investment: trade.type === 'BUY' ? trade.quantity * trade.price : 0,
+        sold: trade.type === 'SELL' ? trade.quantity * trade.price : 0,
         trades: [trade]
       });
     }
@@ -134,7 +164,7 @@ function Portfolio() {
           
           <div className="holdings-section">
             <h3>Your Holdings</h3>
-            {groupedTrades.length > 0 ? (
+            {groupedTrades.filter(holding => holding.quantity > 0).length > 0 ? (
               <table className="holdings-table">
                 <thead>
                   <tr>
@@ -201,8 +231,8 @@ function Portfolio() {
                       <tr key={index}>
                         <td>{new Date(trade.date).toLocaleDateString('en-IN')}</td>
                         <td>{trade.stockSymbol}</td>
-                        <td className={trade.type === 'buy' ? 'buy-type' : 'sell-type'}>
-                          {trade.type.toUpperCase()}
+                        <td className={trade.type === 'BUY' ? 'buy-type' : 'sell-type'}>
+                          {trade.type}
                         </td>
                         <td>{trade.quantity}</td>
                         <td>₹ {trade.price.toFixed(2)}</td>

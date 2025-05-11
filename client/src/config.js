@@ -6,11 +6,21 @@
  * separation of configuration from code.
  */
 
+// Determine if we're in development mode
+const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
 // API Base URLs
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://stock.indianapi.in";
-export const API_URL = import.meta.env.VITE_API_URL || 'http://mahalaxya-api.kundanprojects.space/api';
+export const API_BASE_URL = isDevelopment 
+  ? "http://localhost:8080/api" 
+  : (import.meta.env.VITE_API_BASE_URL || "https://stock.indianapi.in");
+
+export const API_URL = isDevelopment
+  ? "http://localhost:8080/api"
+  : (import.meta.env.VITE_API_URL || 'http://mahalaxya-api.kundanprojects.space/api');
+
 // Updated the finance news API URL to the correct domain
 export const FINANCE_NEWS_API_URL = import.meta.env.VITE_FINANCE_NEWS_API_URL || 'https://finance-news.kundanprojects.space';
+
 // AlphaVantage API configuration
 export const ALPHA_VANTAGE_API_URL = "https://www.alphavantage.co/query";
 export const ALPHA_VANTAGE_API_KEY = "LG1LRCEPYYLALG5Q";
@@ -20,7 +30,7 @@ export const API_KEY = import.meta.env.VITE_API_KEY || "apikey_mock_for_developm
 export const FINANCE_NEWS_API_KEY = import.meta.env.VITE_FINANCE_NEWS_API_KEY || "MiaaEdv6406K9wmvjYT3fOpL4M4tSzuc";
 
 // Feature Flags
-export const ENABLE_MOCK_DATA = import.meta.env.VITE_ENABLE_MOCK_DATA === 'true' || false;
+export const ENABLE_MOCK_DATA = import.meta.env.VITE_ENABLE_MOCK_DATA === 'true' || true; // Enable mock data by default
 
 // App-specific URLs
 export const URLS = {

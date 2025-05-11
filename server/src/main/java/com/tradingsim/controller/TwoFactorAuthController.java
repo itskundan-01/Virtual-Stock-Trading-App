@@ -24,7 +24,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = {"http://localhost:5000", "http://127.0.0.1:5000"}, maxAge = 3600, allowCredentials = "true")
 @RestController
 @RequestMapping("/api/2fa")
 public class TwoFactorAuthController {

@@ -1,18 +1,15 @@
 import axios from 'axios';
 import { API_URL } from '../config';
 
-// Helper to determine if we're in development mode
-const isDevelopment = window.location.hostname === 'localhost';
-const getBaseUrl = () => isDevelopment ? 'http://localhost:8080/api' : API_URL;
+// API_URL is now correctly configured in config.js to use localhost:8080/api when in development mode
 
 export const login = async (email, password) => {
   try {
-    // Use direct axios for login to avoid token issues
+    console.log('Attempting login to:', `${API_URL}/auth/login`);
     const response = await axios.post(
-      `${getBaseUrl()}/auth/login`, 
+      `${API_URL}/auth/login`, 
       { email, password },
       { 
-        withCredentials: false,  // Set to false to avoid CORS preflight issues
         headers: {
           'Content-Type': 'application/json',
         }
@@ -34,8 +31,9 @@ export const login = async (email, password) => {
 
 export const register = async (userData) => {
   try {
+    console.log('Attempting registration to:', `${API_URL}/auth/register`);
     return await axios.post(
-      `${getBaseUrl()}/auth/register`, 
+      `${API_URL}/auth/register`, 
       {
         firstName: userData.firstName,
         lastName: userData.lastName,
@@ -44,7 +42,6 @@ export const register = async (userData) => {
         phone: userData.phone
       },
       {
-        withCredentials: false,
         headers: {
           'Content-Type': 'application/json',
         }
@@ -58,4 +55,5 @@ export const register = async (userData) => {
 
 export const logout = () => {
   localStorage.removeItem('token');
+  localStorage.removeItem('userData');
 };

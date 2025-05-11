@@ -8,6 +8,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 public class CorsConfig {
@@ -28,13 +29,12 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
+        
+        // Explicitly set localhost origins for development
+        config.setAllowedOrigins(Arrays.asList("http://localhost:5000", "http://127.0.0.1:5000"));
         config.setAllowCredentials(true);
         
-        // Parse comma-separated values from properties
-        for (String origin : allowedOrigins.split(",")) {
-            config.addAllowedOrigin(origin.trim());
-        }
-        
+        // Parse remaining configuration values
         for (String method : allowedMethods.split(",")) {
             config.addAllowedMethod(method.trim());
         }

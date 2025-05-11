@@ -103,13 +103,15 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // Parse comma-separated values from properties
-        String[] origins = allowedOrigins.split(",");
+        // Explicitly set allowed origins for development environment
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5000", "http://127.0.0.1:5000"));
+        configuration.setAllowCredentials(true);
+        
+        // Parse other configuration values
         String[] methods = allowedMethods.split(",");
         String[] headers = allowedHeaders.split(",");
         String[] exposed = exposedHeaders.split(",");
         
-        configuration.setAllowedOrigins(Arrays.asList(origins));
         configuration.setAllowedMethods(Arrays.asList(methods));
         configuration.setAllowedHeaders(Arrays.asList(headers));
         configuration.setExposedHeaders(Arrays.asList(exposed));

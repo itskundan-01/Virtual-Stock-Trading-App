@@ -30,14 +30,19 @@ const AuthProvider = ({ children }) => {
       const response = await authServiceLogin(email, password);
       
       if (response.data && response.data.accessToken) {
+        console.log("Login response:", response.data);
+        
         // Extract and format user data
         const userData = {
           id: response.data.id,
           email: response.data.email,
           name: `${response.data.firstName} ${response.data.lastName}`,
-          isAdmin: response.data.roles.includes('ROLE_ADMIN'),
+          // Check for the ROLE_ADMIN in the roles array
+          isAdmin: response.data.roles && response.data.roles.includes('ROLE_ADMIN'),
           twoFactorEnabled: response.data.twoFactorEnabled
         };
+        
+        console.log("User data being stored:", userData);
         
         // Store both token and user data for persistence
         localStorage.setItem("token", response.data.accessToken);

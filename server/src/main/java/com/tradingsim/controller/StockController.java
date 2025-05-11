@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = {"http://localhost:5000", "http://127.0.0.1:5000"}, maxAge = 3600, allowCredentials = "true")
 @RestController
 @RequestMapping("/api/stocks")
 public class StockController {
