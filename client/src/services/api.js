@@ -1,9 +1,16 @@
 import axios from 'axios';
 import { API_URL, API_BASE_URL, API_KEY, FINANCE_NEWS_API_URL, FINANCE_NEWS_API_KEY, ALPHA_VANTAGE_API_URL, ALPHA_VANTAGE_API_KEY } from '../config';
 
+// Determine if we're in development mode (localhost)
+const isDevelopment = window.location.hostname === 'localhost';
+
 // Create API client for backend API
 const api = axios.create({
-  baseURL: API_URL
+  baseURL: isDevelopment ? 'http://localhost:8080/api' : API_URL,
+  withCredentials: false, // Changed to false to avoid CORS preflight issues
+  headers: {
+    'Content-Type': 'application/json',
+  }
 });
 
 // Add token to requests if available
@@ -14,6 +21,19 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Handle common API errors globally
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Handle specific error codes here if needed
+    if (error.response && error.response.status === 401) {
+      console.log('Authentication error - you may need to log in again');
+      // You could redirect to login page here if needed
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Create separate instance for Indian Stock API
 const stockApi = axios.create({

@@ -81,7 +81,9 @@ public class WebSecurityConfig {
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> 
-                auth.requestMatchers(apiBaseUrl + "/auth/**").permitAll()
+                auth.requestMatchers("/").permitAll()  // Allow access to root endpoint
+                    .requestMatchers("/error").permitAll()  // Allow access to error endpoint
+                    .requestMatchers(apiBaseUrl + "/auth/**").permitAll()
                     .requestMatchers(apiBaseUrl + "/health/**").permitAll()
                     .requestMatchers(apiBaseUrl + "/stocks/list").permitAll()
                     .requestMatchers(apiBaseUrl + "/stocks/price/**").permitAll()
